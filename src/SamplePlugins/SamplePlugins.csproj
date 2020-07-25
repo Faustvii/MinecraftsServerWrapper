@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutDir>..\MinecraftServerWrapper\bin\Debug\netcoreapp3.1\win-x64\plugins\</OutDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NbtLib" Version="1.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MinecraftServerWrapper.Models\MinecraftServerWrapper.Models.csproj" />
+  </ItemGroup>
+
+</Project>
