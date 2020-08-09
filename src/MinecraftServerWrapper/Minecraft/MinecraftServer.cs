@@ -33,10 +33,13 @@ namespace MinecraftServerWrapper.Minecraft
             get
             {
                 if (ServerProcess == null) return false;
-                try { Process.GetProcessById(ServerProcess.Id); }
+                try
+                {
+                    var process = Process.GetProcessById(ServerProcess.Id);
+                    return !process.HasExited;
+                }
                 catch (InvalidOperationException) { return false; }
                 catch (ArgumentException) { return false; }
-                return true;
             }
         }
 
@@ -74,7 +77,6 @@ namespace MinecraftServerWrapper.Minecraft
                 EnableRaisingEvents = true
             };
 
-            ServerProcess.Exited += ServerProcess_Exited;
             ServerProcess.OutputDataReceived += ServerProcess_OutputDataReceived;
             ServerProcess.ErrorDataReceived += ServerProcess_ErrorDataReceived;
         }
@@ -103,14 +105,6 @@ namespace MinecraftServerWrapper.Minecraft
             });
         }
 
-        private async void ServerProcess_Exited(object sender, EventArgs e)
-        {
-            await _mediator.Publish(new ServerStoppedNotification
-            {
-
-            });
-        }
-
         /// <summary>
         /// Starts the server process and starts the standard output/error stream if it has not already been started
         /// </summary>
@@ -135,7 +129,7 @@ namespace MinecraftServerWrapper.Minecraft
         public Task StartAsync()
         {
             if (Running)
-                return Task.CompletedTask; ;
+                return Task.CompletedTask;
 
             CreateServerProcess();
             StartServerProcess();

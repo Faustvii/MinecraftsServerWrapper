@@ -5,8 +5,15 @@ namespace MinecraftServerWrapper.Models.Plugins
 {
     public abstract class BasePlugin : IPlugin
     {
+        protected readonly IPluginContext PluginContext;
+
         public abstract string Name { get; }
         public abstract string Description { get; }
+
+        public BasePlugin(IPluginContext pluginContext)
+        {
+            PluginContext = pluginContext;
+        }
 
         public virtual Task OnChatMessage(PlayerChatNotification notification, IPluginContext context)
         {
@@ -44,6 +51,11 @@ namespace MinecraftServerWrapper.Models.Plugins
         }
 
         public virtual Task OnStop(ServerStoppedNotification notification, IPluginContext context)
+        {
+            return Task.CompletedTask;
+        }
+
+        public virtual Task OnCrash(ServerCrashedEvent crashedEvent)
         {
             return Task.CompletedTask;
         }

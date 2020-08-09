@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MinecraftServerWrapper.Handlers
 {
-    public class MinecraftStateHandler : INotificationHandler<PlayerJoinedNotification>, INotificationHandler<PlayerLeftNotification>, INotificationHandler<ServerStoppedNotification>, INotificationHandler<ServerStartedNotification>
+    public class MinecraftStateHandler : INotificationHandler<PlayerJoinedNotification>, INotificationHandler<PlayerLeftNotification>, INotificationHandler<ServerStoppedNotification>, INotificationHandler<ServerStartedNotification>, INotificationHandler<ServerCrashedEvent>
     {
         private readonly IMediator _mediator;
         private readonly MinecraftState _state;
@@ -48,6 +48,17 @@ namespace MinecraftServerWrapper.Handlers
         }
 
         public async Task Handle(ServerStoppedNotification notification, CancellationToken cancellationToken)
+        {
+            _state.Running = false;
+            _state.CurrentPlayers.Clear();
+            _state.StartTime = null;
+            await _mediator.Publish(new MinecraftStateNotification
+            {
+                CurrentState = _state
+            });
+        }
+
+        public async Task Handle(ServerCrashedEvent notification, CancellationToken cancellationToken)
         {
             _state.Running = false;
             _state.CurrentPlayers.Clear();

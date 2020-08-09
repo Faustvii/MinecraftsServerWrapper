@@ -36,7 +36,7 @@ namespace MinecraftServerWrapper.Handlers.Relay
 
         public async Task Handle(PlayerChatNotification notification, CancellationToken cancellationToken)
         {
-            await _wonderlandClient?.SendMessageAsync($"**<{notification.PlayerName.Trim()}>** {notification.Message.Trim()}");
+            await _wonderlandClient?.SendChatMessageAsync($"**<{notification.PlayerName.Trim()}>** {notification.Message.Trim()}");
         }
 
         public async Task Handle(PlayerAdvancementNotification notification, CancellationToken cancellationToken)

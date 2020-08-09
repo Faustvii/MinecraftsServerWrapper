@@ -14,6 +14,10 @@ namespace SamplePlugins
 {
     public class DeathLocation : BasePlugin
     {
+        public DeathLocation(IPluginContext pluginContext) : base(pluginContext)
+        {
+        }
+
         public override string Name => "Death Location";
         public override string Description => "Whispers the location where the player died to them in chat";
 

@@ -36,7 +36,13 @@ namespace MinecraftServerWrapper.Discord.Modules
                 {
                     var result = await cmd.CheckPreconditionsAsync(Context);
                     if (result.IsSuccess)
-                        description += $"{prefix}{cmd.Aliases.First()}\n";
+                    {
+                        description += $"{prefix}{cmd.Aliases.First()} ";
+                        if (cmd.Parameters.Any())
+                            description += $"'{string.Join(" ", cmd.Parameters.Select(x => $"**{x.Name}**"))}'";
+
+                        description += "\n";
+                    }
                 }
 
                 if (!string.IsNullOrWhiteSpace(description))

@@ -135,6 +135,11 @@ namespace MinecraftServerWrapper.Handlers
                         DeathMessage = deathMessage
                     });
                 }
+                else if (Regex.IsMatch(message, @"^This crash report .+: (.+)$"))
+                {
+                    var crashReport = Regex.Match(message, @"^This crash report .+: (.+)$").Groups[1].Value;
+                    await _mediator.Publish(new ServerCrashedEvent(crashReport));
+                }
             }
         }
     }

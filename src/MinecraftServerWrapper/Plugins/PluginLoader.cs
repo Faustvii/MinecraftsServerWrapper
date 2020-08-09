@@ -73,6 +73,13 @@ namespace MinecraftServerWrapper.Plugins
             services.AddSingleton(_severWrapperProvider.GetService<IMediator>());
             services.AddSingleton<IMinecraftServer>(_severWrapperProvider.GetService<MinecraftServer>());
             services.AddSingleton<IMinecraftDiscordClient>(_severWrapperProvider.GetService<WonderlandClient>());
+            services.AddSingleton<IPluginContext>(x => new PluginContext
+            {
+                MinecraftProperties = _severWrapperProvider.GetService<MinecraftProperties>(),
+                MinecraftSettings = _severWrapperProvider.GetService<IOptions<MinecraftSettings>>().Value,
+                MinecraftServer = _severWrapperProvider.GetService<MinecraftServer>(),
+                Logger = _severWrapperProvider.GetService<PluginLogger>()
+            });
 
             services.Scan(x =>
             {

@@ -16,7 +16,7 @@ namespace MinecraftServerWrapper.Handlers.Relay
     internal class PluginRelayHandler :
         INotificationHandler<ServerStoppedNotification>, INotificationHandler<ServerStartedNotification>,
         INotificationHandler<PlayerDiedNotification>, INotificationHandler<PlayerAdvancementNotification>,
-        INotificationHandler<PlayerJoinedNotification>, INotificationHandler<PlayerLeftNotification>, INotificationHandler<PlayerChatNotification>
+        INotificationHandler<PlayerJoinedNotification>, INotificationHandler<PlayerLeftNotification>, INotificationHandler<PlayerChatNotification>, INotificationHandler<ServerCrashedEvent>
     {
         private readonly PluginLoader _pluginLoader;
         private readonly IMediator _mediator;
@@ -163,6 +163,25 @@ namespace MinecraftServerWrapper.Handlers.Relay
                     {
                         Exception = ex,
                         Message = $"Error in {nameof(plugin.OnPlayerAdvancement)} for plugin {plugin.Name}"
+                    });
+                }
+            }
+        }
+
+        public async Task Handle(ServerCrashedEvent notification, CancellationToken cancellationToken)
+        {
+            foreach (var plugin in _pluginLoader.Enabled)
+            {
+                try
+                {
+                    await plugin.OnCrash(notification);
+                }
+                catch (Exception ex)
+                {
+                    await _mediator.Publish(new PluginLogNotification
+                    {
+                        Exception = ex,
+                        Message = $"Error in {nameof(plugin.OnCrash)} for plugin {plugin.Name}"
                     });
                 }
             }

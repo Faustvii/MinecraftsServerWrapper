@@ -9,6 +9,7 @@ using MinecraftServerWrapper.Models.Settings;
 using MinecraftServerWrapper.Requests.Minecraft;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -23,6 +24,7 @@ namespace MinecraftServerWrapper.Discord
         private readonly IMediator _mediator;
 
         private readonly ConcurrentDictionary<string, IUserMessage> _whitelistQueue = new ConcurrentDictionary<string, IUserMessage>();
+        private readonly List<string> _whitelistMessages = new List<string>();
 
         public WonderlandClient(DiscordSocketClient client, CommandHandler commandHandler, IOptions<DiscordSettings> settings, IMediator mediator)
         {
@@ -42,6 +44,7 @@ namespace MinecraftServerWrapper.Discord
             {
                 if (_whitelistQueue.TryRemove(playerWhitelisted.PlayerName, out var msg))
                 {
+                    _whitelistMessages.RemoveAll(x => x == playerWhitelisted.PlayerName);
                     await msg.DeleteAsync();
                 }
             };
@@ -95,10 +98,27 @@ namespace MinecraftServerWrapper.Discord
                 if (string.IsNullOrWhiteSpace(arg.Content))
                     return;
 
+                var content = arg.Content;
+
+                foreach (var user in arg.MentionedUsers)
+                {
+                    content = arg.Content.Replace($"<@!{user.Id}>", $"@{user.Username}");
+                }
+
+                foreach (var role in arg.MentionedRoles)
+                {
+                    content = arg.Content.Replace($"<@&{role.Id}>", $"@{role.Name}");
+                }
+
+                foreach (var channel in arg.MentionedChannels)
+                {
+                    content = arg.Content.Replace($"<#{channel.Id}>", $"#{channel.Name}");
+                }
+
                 await _mediator.Publish(new DiscordChatMessageNotification
                 {
                     Username = arg.Author.Username,
-                    Message = arg.Content
+                    Message = content
                 });
             }
         }
@@ -134,6 +154,41 @@ namespace MinecraftServerWrapper.Discord
             await channel?.SendMessageAsync(msg);
         }
 
+        public async Task SendChatMessageAsync(string msg)
+        {
+            if (Client.ConnectionState != ConnectionState.Connected)
+            {
+                return;
+            }
+
+            var message = msg;
+            var channel = Client.GetGuild(_settings.GuildId).GetTextChannel(_settings.ChatChannelId);
+            if (Regex.IsMatch(msg, "@(.+?) "))
+            {
+                var groups = Regex.Matches(msg, "@(.+?) ");
+                for (var i = 0; i < groups.Count; i++)
+                {
+                    var group = groups[i];
+                    var groupValue = group.Value.Trim();
+                    var tagMention = group.Groups[1].Value;
+                    if (channel.Users.Any(x => x.Username.Equals(tagMention, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        message = msg.Replace(groupValue, channel.Users.First(x => x.Username.Equals(tagMention, StringComparison.OrdinalIgnoreCase)).Mention);
+                    }
+                    else if (channel.Users.Any(x => x.Nickname != null && x.Nickname.Equals(tagMention, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        message = msg.Replace(groupValue, channel.Users.First(x => x.Nickname != null && x.Nickname.Equals(tagMention, StringComparison.OrdinalIgnoreCase)).Mention);
+                    }
+                    else if (channel.Guild.Roles.Any(x => x.Name.Equals(tagMention, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        message = msg.Replace(groupValue, channel.Guild.Roles.First(x => x.Name.Equals(tagMention, StringComparison.OrdinalIgnoreCase)).Mention);
+                    }
+                }
+            }
+
+            await channel?.SendMessageAsync(message);
+        }
+
         public async Task SendWhitelistMessageAsync(PlayerNotWhitelistedNotification whitelistEvent)
         {
             var guild = Client.GetGuild(_settings.GuildId);
@@ -141,6 +196,12 @@ namespace MinecraftServerWrapper.Discord
             if (role == null)
                 return;
 
+            if (_whitelistMessages.Any(x => x == whitelistEvent.PlayerName))
+            {
+                return;
+            }
+
+            _whitelistMessages.Add(whitelistEvent.PlayerName);
 
             var channel = guild.GetTextChannel(_settings.CommandChannelId);
             var msg = await channel.SendMessageAsync($"{role.Mention} '{whitelistEvent.PlayerName}' is not whitelisted, want to whitelist?");

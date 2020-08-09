@@ -14,6 +14,8 @@ namespace MinecraftServerWrapper.Discord.Modules
         {
             // ~admin clean
             [Command]
+            [RequireUserPermission(GuildPermission.ManageMessages)]
+            [RequireBotPermission(GuildPermission.ManageMessages)]
             public async Task DefaultCleanAsync()
             {
                 var messages = await Context.Channel.GetMessagesAsync(100).FlattenAsync();
@@ -22,6 +24,8 @@ namespace MinecraftServerWrapper.Discord.Modules
 
             // ~admin clean messages 15
             [Command("messages")]
+            [RequireUserPermission(GuildPermission.ManageMessages)]
+            [RequireBotPermission(GuildPermission.ManageMessages)]
             public async Task CleanAsync(int count)
             {
                 var messages = await Context.Channel.GetMessagesAsync(count).FlattenAsync();
@@ -30,6 +34,8 @@ namespace MinecraftServerWrapper.Discord.Modules
         }
         // ~admin ban foxbot#0282
         [Command("ban")]
+        [RequireUserPermission(GuildPermission.BanMembers)]
+        [RequireBotPermission(GuildPermission.BanMembers)]
         public Task BanAsync(IGuildUser user) =>
             Context.Guild.AddBanAsync(user);
     }
