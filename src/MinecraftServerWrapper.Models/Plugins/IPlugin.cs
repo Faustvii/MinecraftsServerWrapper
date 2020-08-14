@@ -20,6 +20,11 @@ namespace MinecraftServerWrapper.Models.Plugins
         Task OnLoad(IPluginContext context);
 
         /// <summary>
+        /// Called when the plugin is loaded
+        /// </summary>
+        Task OnUnload();
+
+        /// <summary>
         /// Called when the server starts
         /// </summary>
         Task OnStart(ServerStartedNotification notification, IPluginContext context);

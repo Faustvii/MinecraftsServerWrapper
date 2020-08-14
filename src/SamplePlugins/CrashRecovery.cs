@@ -12,7 +12,7 @@ namespace SamplePlugins
         private readonly IMinecraftDiscordClient _minecraftDiscordClient;
 
         public override string Name => "Crash Recovery";
-        public override string Description => "This will try to restart the server if it crashes";
+        public override string Description => "This will attempt to restart the server if it crashes";
         public Queue<DateTimeOffset> CrashRecoveryQueue = new Queue<DateTimeOffset>();
 
         public CrashRecovery(IMinecraftDiscordClient minecraftDiscordClient, IPluginContext context) : base(context)

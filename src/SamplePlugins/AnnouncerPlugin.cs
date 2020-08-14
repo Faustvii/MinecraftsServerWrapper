@@ -29,12 +29,12 @@ namespace SamplePlugins
 
         public override async Task OnPlayerJoin(PlayerJoinedNotification notification, IPluginContext context)
         {
-            await _minecraftDiscordClient.SendMessageAsync($"{notification.PlayerName} has joined the game.");
+            await _minecraftDiscordClient.SendMessageAsync($"**{notification.PlayerName}** has joined the game.");
         }
 
         public override async Task OnPlayerLeft(PlayerLeftNotification notification, IPluginContext context)
         {
-            await _minecraftDiscordClient.SendMessageAsync($"{notification.PlayerName} has left the game.");
+            await _minecraftDiscordClient.SendMessageAsync($"**{notification.PlayerName}** has left the game.");
         }
     }
 }

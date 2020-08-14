@@ -102,7 +102,7 @@ namespace MinecraftServerWrapper.Discord
 
                 foreach (var user in arg.MentionedUsers)
                 {
-                    content = arg.Content.Replace($"<@!{user.Id}>", $"@{user.Username}");
+                    content = arg.Content.Replace($"<@!{user.Id}>", $"@{user.Username}").Replace($"<@{user.Id}>", $"@{user.Username}");
                 }
 
                 foreach (var role in arg.MentionedRoles)

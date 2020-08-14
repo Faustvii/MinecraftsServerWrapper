@@ -59,5 +59,10 @@ namespace MinecraftServerWrapper.Models.Plugins
         {
             return Task.CompletedTask;
         }
+
+        public virtual Task OnUnload()
+        {
+            return Task.CompletedTask;
+        }
     }
 }

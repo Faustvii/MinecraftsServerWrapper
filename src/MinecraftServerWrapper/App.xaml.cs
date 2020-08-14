@@ -70,7 +70,8 @@ namespace MinecraftServerWrapper
             services.AddSingleton<MinecraftProperties>();
             services.AddSingleton<MinecraftState>();
             services.AddSingleton<RelayEventHandler>();
-            services.AddSingleton<PluginLoader>();
+            //services.AddSingleton<PluginLoader>();
+            services.AddSingleton<PluginFactory>();
             services.AddSingleton<PluginLogger>();
         }
     }

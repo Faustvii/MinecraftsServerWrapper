@@ -18,11 +18,11 @@ namespace MinecraftServerWrapper.Handlers.Relay
         INotificationHandler<PlayerDiedNotification>, INotificationHandler<PlayerAdvancementNotification>,
         INotificationHandler<PlayerJoinedNotification>, INotificationHandler<PlayerLeftNotification>, INotificationHandler<PlayerChatNotification>, INotificationHandler<ServerCrashedEvent>
     {
-        private readonly PluginLoader _pluginLoader;
+        private readonly PluginFactory _pluginLoader;
         private readonly IMediator _mediator;
         private readonly PluginContext _pluginContext;
 
-        public PluginRelayHandler(PluginLoader pluginLoader, MinecraftProperties minecraftProperties, IOptions<MinecraftSettings> minecraftSettings, IMediator mediator, MinecraftServer minecraftServer, PluginLogger pluginLogger)
+        public PluginRelayHandler(PluginFactory pluginLoader, MinecraftProperties minecraftProperties, IOptions<MinecraftSettings> minecraftSettings, IMediator mediator, MinecraftServer minecraftServer, PluginLogger pluginLogger)
         {
             _pluginLoader = pluginLoader;
             _mediator = mediator;

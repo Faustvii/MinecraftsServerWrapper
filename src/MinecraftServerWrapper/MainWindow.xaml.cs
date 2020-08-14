@@ -14,7 +14,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace MinecraftServerWrapper
 {
@@ -31,10 +33,10 @@ namespace MinecraftServerWrapper
         readonly MinecraftServer _minecraft;
         readonly WonderlandClient _wonderlandClient;
         private readonly RelayEventHandler _relayEventHandler;
-        private readonly PluginLoader _pluginLoader;
+        private readonly PluginFactory _pluginLoader;
         private readonly MinecraftState _minecraftState;
 
-        public MainWindow(MinecraftServer minecraft, WonderlandClient wonderlandClient, IOptions<Settings> settings, RelayEventHandler relayEventHandler, PluginLoader pluginLoader, MinecraftState minecraftState)
+        public MainWindow(MinecraftServer minecraft, WonderlandClient wonderlandClient, IOptions<Settings> settings, RelayEventHandler relayEventHandler, PluginFactory pluginLoader, MinecraftState minecraftState)
         {
             InitializeComponent();
             DataContext = new
@@ -221,7 +223,42 @@ namespace MinecraftServerWrapper
         private void Backup_Click(object sender, RoutedEventArgs e)
         {
             Debug.WriteLine("backup click");
+            foreach (var plugin in _pluginLoader.Enabled)
+            {
+                var stackPanel = new StackPanel();
+                var grid = new Grid
+                {
+                    Background = Brushes.Black,
+                };
 
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+                grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+                grid.Children.Add(new Label { Foreground = Brushes.White, FontSize = 16, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center, Content = plugin.Description });
+                var button = new Button { Content = "Click me" };
+                button.Click += Button_Click;
+                grid.Children.Add(button);
+
+                var tab = new TabItem()
+                {
+                    Header = plugin.Name,
+                    Background = Brushes.Gray,
+                    Content = grid
+                };
+
+
+                Tabs.Items.Add(tab);
+            }
+
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Debug.WriteLine("DAMN!");
         }
 
         private void UpdateMod_Click(object sender, RoutedEventArgs e)
@@ -269,7 +306,7 @@ namespace MinecraftServerWrapper
 
         private void ReloadPlugin_Click(object sender, RoutedEventArgs e)
         {
-            _pluginLoader.Reload();
+            _pluginLoader.Load();
         }
 
         private void OpenPluginFolder_Click(object sender, RoutedEventArgs e)
